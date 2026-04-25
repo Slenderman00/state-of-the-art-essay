@@ -1,5 +1,4 @@
-# Reading List
----
+## Reading List
 - [ ] http_load_balancing_performance_evaluation_bachelor_2022.pdf
 - [ ] selecting_a_service_mesh_implementation_for_managing_microservices.pdf
 - [ ] testing_resilience_of_envoy_service_proxy.pdf
@@ -9,9 +8,7 @@
 - [ ] geodns.pdf
 - [ ] rearchitecting_kubernetes_for_the_edge.pdf
 ---
-
-# Skim List
----
+## Skim List
 - [ ] secure_adn_scalable_reverse_proxy.pdf
 - [ ] load_balancer_tuning.pdf
 - [ ] optimizing_kubernetes_based_saas_applications.pdf
