@@ -1,6 +1,6 @@
 # Reading List
 ---
-[ ] http_load_balancing_performance_evaluation_bachelor_2022.pdf
+[] http_load_balancing_performance_evaluation_bachelor_2022.pdf
 [ ] selecting_a_service_mesh_implementation_for_managing_microservices.pdf
 [ ] testing_resilience_of_envoy_service_proxy.pdf
 [ ] xlb_a_high_performance_layer_7_load_balancer_for_microservices.pdf
