@@ -1,0 +1,228 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage[style=ieee]{biblatex}
+\addbibresource{library.bib}
+
+\definecolor{darkblue}{RGB}{0, 0, 102}
+\hypersetup{
+    colorlinks=true,
+    urlcolor=darkblue,
+    linkcolor=darkblue,
+    citecolor=darkblue,
+}
+
+\title{
+    \textbf{DNS-Based Traffic Steering for IPv6-Enabled Edge Microservices}\\[0.5em]
+    \large Extended Project Description
+}
+\author{Joar Heimonen \\ \texttt{contact@joar.me}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+% - What is the problem? Proxies are everywhere, they introduce overhead and single points of failure
+% - Motivate from PEAK: IPv6 abundance eliminates NAT, DNS can steer traffic directly
+% - State the thesis question clearly
+% - Briefly describe the structure of this document
+The modern cloud computing stack relies heavily on Layer 7 proxies and service meshes to manage traffic between services however
+this comes at a cost. These layer 7 proxies introduce single points of failure in otherwise distributed systems, whilst adding unneccesary
+complexity and reducing the effectiveness of layer 3 routing. Service meshes add sidecar containers to every pod.
+This overhead scales with the amount of microservices you have.
+
+This architectural pattern did not emerge by design. IPv4 exhaustion forced the development of technologies like
+NAT (Network Address Translation) and shared address spaces. With the introduction of NAT end-to-end accessibility was broken
+making proxies a structural necessity.
+
+With a rapid increase in IPv6 adoption it is time to leave the technical limitations of the past in the past
+and build our services with IPv6s large adress space in mind. Under RIPE-738 \cite{IPv6AddressAllocationa}, a Local internet registry recieves a minimum allocation size of CIDR /32 up to /29
+without needing to justify it. A /29 allocation alone contains around 147 billion times more addresses than the whole IPv4 address space.
+
+This thesis investigates whether DNS-based traffic steering, combined with direct IPv6 addressing of microservices can serve
+as a viable alternative to traditional layer 7 ingress proxies and service meshes. Rather than routing traffic trough a centralized proxy
+each pod is assigned a globally routable address and made directly reachable by clients.
+Traffic steering decissions are delegated to a purpose built DNS server that dynamically manages record
+based on pod health and metrics.
+
+The remainder of this document surveys the state of the art in traffic steering and proxy scalability, identifies the gap that motivates this research
+and outlines the proposed approach, experimental methodology and work plan.
+
+\section{State of the Art in Traffic Steering and Proxy Scalability}
+
+\subsection{The End-to-End Principle and the Role of NAT}
+% Saltzer Reed Clark 1984 — functions belong at endpoints
+% IPv4 NAT broke end-to-end addressability
+% IPv6 restores it — this is the architectural enabler of PEAK
+
+Saltzer, Reed and Clark established in 1984 that application specific functions should be
+implemented at the endpoints of a communication system rather than within the network itself \cite{saltzerEndtoendArgumentsSystem1984}.
+A network that simply moves packets without enforcing control points is inherently more ressilient. There are no forced 
+bottlenecks, no single points of failure introduces by the infrastructure itself. Packets are free to be
+routed as the network sees fit.
+
+The widespread adoption of NAT under IPv4 fundementally broke this principle. By placing address translation logic
+inside the network, NAT made end-to-end addressability impossible. Applications could no longer communicate directly over the internet.
+They required proxies, STUN servers and other middleboxes to facilitate communication compansating for the loss of
+globally unique addressing.
+
+IPv6 restores the conditions under which end-to-end addressability principle can be applied. With a globally unique address assigned to
+every endpoint there is no longer a structural requirement for address translation or centralized proxies. The network can return to its intended role,
+moving packets between endpoints that are directly reachable by design.
+
+
+
+\subsection{Layer 7 Proxies and Ingress Controllers}
+% What is a proxy, what does it do
+% HAProxy, NGINX, Envoy, Traefik — design patterns and tradeoffs
+% Overhead: TLS termination, connection management, CPU cost
+% Centralized bottleneck problem
+% Cite: bachelor comparison, secure reverse proxy
+
+\subsection{Service Mesh Architectures}
+% Why service meshes emerged — observability, resilience, policy
+% Sidecar model: Istio, Cilium, AWS App Mesh
+% Overhead analysis — duplicate protocol processing, cross-process cost
+% Movement toward sidecar-less approaches
+% Cite: selecting service mesh, XLB motivation section
+
+\subsection{Kernel and Hardware Acceleration}
+% The insight: placement of logic in the stack drives overhead
+% eBPF: moving L7 logic into kernel (XLB, Cilium/Miziński)
+% DPU: moving service mesh to hardware (FlatProxy)
+% Tradeoffs: complexity, compatibility, security model
+% Cite: XLB, FlatProxy, eBPF Kubernetes paper
+
+\subsection{DNS-Based Traffic Steering}
+% DNS as a distributed system — what it can and cannot do
+% GeoDNS: geographic steering at Internet scale
+% TTL as the core tradeoff: consistency vs load
+% Cite: Hawley, Moura, Shaikh, Chatterjee
+% The gap: nobody has used DNS as a primary per-pod steering mechanism
+% IPv6 is what makes this viable — globally routable pod addresses
+
+\subsection{Edge and Orchestration Context}
+% Kubernetes at the edge — etcd bottleneck, consistency tradeoffs
+% Pressure on centralized control assumptions
+% Cite: Rearchitecting Kubernetes for the Edge
+
+\section{Literature Search Methodology}
+% How the search was conducted
+% Keywords used
+% Inclusion/exclusion criteria
+% Snowballing
+% Table of papers
+
+The literature search was conducted using Google Scholar and Google Scholar Labs.
+Search terms were initially generated with the assistance of a large language model based on the research topic, and subsequently refined through iterative searching.
+The following keyword queries were used:
+\begin{itemize}
+    \item \textit{DNS TTL load balancing consistency tradeoff}
+    \item \textit{IPv6 end-to-end addressing NAT elimination}
+    \item \textit{eBPF Kubernetes networking performance}
+    \item \textit{service mesh overhead scalability microservices}
+    \item \textit{DNS-based server selection load balancing}
+\end{itemize}
+Papers were selected based on relevance to the research problem, publication venue quality, and citation count.
+The search was supplemented by backward snowballing from the reference lists of key papers, through which several foundational works were identified.
+Papers published in predatory or low-quality journals were excluded.
+
+The resulting set of nine papers is summarized in Table \ref{tab:papers}.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lllp{6cm}}
+\toprule
+\textbf{\#} & \textbf{Authors} & \textbf{Year} & \textbf{Key Claim} \\
+\midrule
+1 & Wang, Shou, Qian, Liu          & 2026 & In-kernel eBPF L7 load balancer, 1.5x throughput over Istio \cite{wangXLBHighPerformance2026} \\
+2 & Li, Lu, Lin, Wu, Zhang, Yan    & 2023 & DPU-centric service mesh, 90\% latency reduction vs Envoy \cite{liFlatProxyDPUcentricService2023} \\
+3 & Hawley                         & 2009 & GeoDNS geographic traffic steering at Internet scale \cite{hawleyGeoDNSGeographicallyAware} \\
+4 & Jeffery, Howard, Mortier       & 2021 & etcd strong consistency bottleneck in edge Kubernetes \cite{jefferyRearchitectingKubernetesEdge2021} \\
+5 & Miziński, Przyłucki            & 2025 & Cilium eBPF vs iptables: lower CPU/memory under load \cite{mizinskiImpactUsingEBPF2025} \\
+6 & Moura, Heidemann, Schmidt      & 2019 & DNS TTL tradeoffs between caching efficiency and routing flexibility \cite{mouraCacheMeIf2019} \\
+7 & Shaikh, Tewari, Agrawal        & 2001 & Reducing DNS TTL increases nameserver load by orders of magnitude \cite{shaikhEffectivenessDNSbasedServer2001} \\
+8 & Chatterjee, Tari, Zomaya       & 2005 & Adaptive TTL approach reduces client-perceived latency by 16\% \cite{chatterjeeTaskbasedAdaptiveTTL2005} \\
+9 & Saltzer, Reed, Clark           & 1984 & End-to-end principle: functions belong at endpoints, not in the network \cite{saltzerEndtoendArgumentsSystem1984} \\
+\bottomrule
+\end{tabular}
+\caption{Papers included in the literature review}
+\label{tab:papers}
+\end{table}
+
+\section{Problem Description}
+% Detailed statement of the research problem
+% What gap does this thesis address
+% Concrete examples of the limitations of current approaches
+% How PEAK (prior work) motivates the research question
+% What we do not yet know — the experimental gap
+
+\section{Discussion}
+% Comparison across approaches
+% Common patterns: all current approaches assume centralized L7 control
+% The overhead is not incidental — it is structural
+% IPv6 + DNS as a structural alternative
+% What tradeoffs does the proposed approach introduce
+% Consistency guarantees, TTL propagation, failure detection
+
+\section{Proposed Approach and Methodology}
+% Describe the PEAK architecture and PeakDNS
+% What the thesis will build on top of the prior work
+% Experimental design:
+%   - DNS server as Kubernetes ingress controller
+%   - IPv6 globally routable pod addresses
+%   - Prometheus-based metric-driven record management
+%   - Dummy microservices and client simulators
+%   - Constant pod count, varying client count
+%   - Metrics: RTT, throughput, CPU, failover behavior
+
+\section{Work Plan and Milestones}
+
+\subsection*{Spring 2026}
+\begin{itemize}
+    \item Systematization of knowledge and literature study
+    \item Write and submit mandatory essay on the state of proxy scalability
+    \item Restructure essay into draft systematization of knowledge chapter
+    \item Start development of DNS server
+\end{itemize}
+
+\subsection*{Autumn 2026}
+\begin{itemize}
+    \item Finish development of DNS server and custom ingress controller
+    \item Implement client simulator and dummy microservices
+    \item Select baseline paradigms
+    \item Start developing the experiments
+    \item Begin writing thesis background and methodology chapters
+\end{itemize}
+
+\subsection*{Spring 2027}
+\begin{itemize}
+    \item Perform the experiments
+    \item Analyze the results
+    \item Write article on DNS-based traffic steering
+    \item Finish master thesis
+\end{itemize}
+
+\section{Conclusion}
+% Summarize the state of the art
+% What problems remain unsolved
+% What the literature is moving toward
+% Where your thesis fits and what it contributes
+
+\newpage
+\printbibliography
+\end{document}
