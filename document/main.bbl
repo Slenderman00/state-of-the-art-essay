@@ -197,89 +197,6 @@
       \verb /home/joar/Zotero/storage/KJK33IAB/Li et al. - 2023 - FlatProxy A DPU-centric Service Mesh Architecture.pdf
       \endverb
     \endentry
-    \entry{hawleyGeoDNSGeographicallyAware}{article}{}{}
-      \name{author}{1}{}{%
-        {{hash=9a80ec3516d69d96271fac41cca2a267}{%
-           family={Hawley},
-           familyi={H\bibinitperiod},
-           given={John},
-           giveni={J\bibinitperiod}}}%
-      }
-      \strng{namehash}{9a80ec3516d69d96271fac41cca2a267}
-      \strng{fullhash}{9a80ec3516d69d96271fac41cca2a267}
-      \strng{fullhashraw}{9a80ec3516d69d96271fac41cca2a267}
-      \strng{bibnamehash}{9a80ec3516d69d96271fac41cca2a267}
-      \strng{authorbibnamehash}{9a80ec3516d69d96271fac41cca2a267}
-      \strng{authornamehash}{9a80ec3516d69d96271fac41cca2a267}
-      \strng{authorfullhash}{9a80ec3516d69d96271fac41cca2a267}
-      \strng{authorfullhashraw}{9a80ec3516d69d96271fac41cca2a267}
-      \field{sortinit}{5}
-      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{abstract}{The Open Source community has grown from a series of small projects hosted from anywhere that was convenient, to a globally distributed set of mirrors providing content to every region of the planet. While there has been an outpouring of support in providing mirrors to every possible facet of the Open Source community by independent entities, a problem has arisen in how to efficiently load-balance across this global infrastructure, not only for the benefit of the mirrors, but for the users as well. There are a multitude of solutions currently available to try and cope with the issues of load-balancing including physical load-balancers like squid, protocolspecific redirection like mod\_geoip in Apache, and fullscale commercial content distribution like Akamai. For most situations, the commercial solutions are far outside of reach and may necessitate the removal of existing infrastructure. Things like squid require, for practicality, all of the machines to be in a single location or for a single location to provide the sum total of the bandwidth available. Lastly, the protocol-specific solutions like mod\_geoip work well for their own protocol, but leave other services like rsync, ftp, git, and svn to fend for themselves---assuming that the protocol even supports redirection. Most do not.}
-      \field{langid}{english}
-      \field{title}{{{GeoDNS}}---{{Geographically-aware}}, Protocol-Agnostic Load Balancing at the {{DNS}} Level}
-      \verb{file}
-      \verb /home/joar/Zotero/storage/SLHVZRZE/Hawley - GeoDNS—Geographically-aware, protocol-agnostic loa.pdf
-      \endverb
-    \endentry
-    \entry{jefferyRearchitectingKubernetesEdge2021}{inproceedings}{}{}
-      \name{author}{3}{}{%
-        {{hash=d07d594aaadc79e8c299fec2bc17372c}{%
-           family={Jeffery},
-           familyi={J\bibinitperiod},
-           given={Andrew},
-           giveni={A\bibinitperiod}}}%
-        {{hash=ab451ce5642ffe31693f5d0a199bee34}{%
-           family={Howard},
-           familyi={H\bibinitperiod},
-           given={Heidi},
-           giveni={H\bibinitperiod}}}%
-        {{hash=ba494cf2fcd5b5c3ed0f9d081c6a4556}{%
-           family={Mortier},
-           familyi={M\bibinitperiod},
-           given={Richard},
-           giveni={R\bibinitperiod}}}%
-      }
-      \list{location}{1}{%
-        {New York, NY, USA}%
-      }
-      \list{publisher}{1}{%
-        {Association for Computing Machinery}%
-      }
-      \strng{namehash}{e8307cbf017a47415092b7de54a3241c}
-      \strng{fullhash}{d97e5a23afb3c100f30c319279034124}
-      \strng{fullhashraw}{d97e5a23afb3c100f30c319279034124}
-      \strng{bibnamehash}{d97e5a23afb3c100f30c319279034124}
-      \strng{authorbibnamehash}{d97e5a23afb3c100f30c319279034124}
-      \strng{authornamehash}{e8307cbf017a47415092b7de54a3241c}
-      \strng{authorfullhash}{d97e5a23afb3c100f30c319279034124}
-      \strng{authorfullhashraw}{d97e5a23afb3c100f30c319279034124}
-      \field{sortinit}{6}
-      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{abstract}{Recent years have seen Kubernetes emerge as a primary choice for container orchestration. Kubernetes largely targets the cloud environment but new use cases require performant, available and scalable orchestration at the edge. Kubernetes stores all cluster state in etcd, a strongly consistent key-value store. We find that at larger etcd cluster sizes, offering higher availability, write request latency significantly increases and throughput decreases similarly. Coupled with approximately 30\% of Kubernetes requests being writes, this directly impacts the request latency and availability of Kubernetes, reducing its suitability for the edge. We revisit the requirement of strong consistency and propose an eventually consistent approach instead. This enables higher performance, availability and scalability whilst still supporting the broad needs of Kubernetes. This aims to make Kubernetes much more suitable for performance-critical, dynamically-scaled edge solutions.}
-      \field{booktitle}{Proceedings of the 4th {{International Workshop}} on {{Edge Systems}}, {{Analytics}} and {{Networking}}}
-      \field{isbn}{978-1-4503-8291-5}
-      \field{month}{4}
-      \field{series}{{{EdgeSys}} '21}
-      \field{title}{Rearchitecting {{Kubernetes}} for the {{Edge}}}
-      \field{urlday}{21}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{year}{2021}
-      \field{urldateera}{ce}
-      \field{pages}{7\bibrangedash 12}
-      \range{pages}{6}
-      \verb{doi}
-      \verb 10.1145/3434770.3459730
-      \endverb
-      \verb{file}
-      \verb /home/joar/Zotero/storage/Z2ZEZLPJ/Jeffery et al. - 2021 - Rearchitecting Kubernetes for the Edge.pdf
-      \endverb
-    \endentry
     \entry{mizinskiImpactUsingEBPF2025}{article}{}{}
       \name{author}{2}{}{%
         {{hash=d7616f7936a5a7e54142013b07f862dd}{%
@@ -301,8 +218,8 @@
       \strng{authornamehash}{d18d48d438c98c8b0e75bd3431633436}
       \strng{authorfullhash}{d18d48d438c98c8b0e75bd3431633436}
       \strng{authorfullhashraw}{d18d48d438c98c8b0e75bd3431633436}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{abstract}{The aim of this study was to investigate the impact of eBPF technology on the performance of network solutions in Kubernetes clusters. Two configurations were compared: a traditional iptables-based setup and eBPF based solution via the Cilium networking plugin. Performance tests were conducted, measuring throughput, latency, CPU usage, and memory consumption under unloaded and loaded conditions. The results indicate that the traditional configuration achieved higher throughput and lower latency in unloaded scenarios. However, under load, the eBPF-enabled cluster demonstrated advantages, including reduced CPU and memory usage and slightly improved latency. This study highlights the potential of eBPF as an efficient technology for Kubernetes environments, particularly in scenarios demanding high performance and resource efficiency.}
@@ -323,6 +240,33 @@
       \verb 10.35784/jcsi.7110
       \endverb
       \keyw{Cilium,CNI,eBPF,Kubernetes,performance}
+    \endentry
+    \entry{hawleyGeoDNSGeographicallyAware}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=9a80ec3516d69d96271fac41cca2a267}{%
+           family={Hawley},
+           familyi={H\bibinitperiod},
+           given={John},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{9a80ec3516d69d96271fac41cca2a267}
+      \strng{fullhash}{9a80ec3516d69d96271fac41cca2a267}
+      \strng{fullhashraw}{9a80ec3516d69d96271fac41cca2a267}
+      \strng{bibnamehash}{9a80ec3516d69d96271fac41cca2a267}
+      \strng{authorbibnamehash}{9a80ec3516d69d96271fac41cca2a267}
+      \strng{authornamehash}{9a80ec3516d69d96271fac41cca2a267}
+      \strng{authorfullhash}{9a80ec3516d69d96271fac41cca2a267}
+      \strng{authorfullhashraw}{9a80ec3516d69d96271fac41cca2a267}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The Open Source community has grown from a series of small projects hosted from anywhere that was convenient, to a globally distributed set of mirrors providing content to every region of the planet. While there has been an outpouring of support in providing mirrors to every possible facet of the Open Source community by independent entities, a problem has arisen in how to efficiently load-balance across this global infrastructure, not only for the benefit of the mirrors, but for the users as well. There are a multitude of solutions currently available to try and cope with the issues of load-balancing including physical load-balancers like squid, protocolspecific redirection like mod\_geoip in Apache, and fullscale commercial content distribution like Akamai. For most situations, the commercial solutions are far outside of reach and may necessitate the removal of existing infrastructure. Things like squid require, for practicality, all of the machines to be in a single location or for a single location to provide the sum total of the bandwidth available. Lastly, the protocol-specific solutions like mod\_geoip work well for their own protocol, but leave other services like rsync, ftp, git, and svn to fend for themselves---assuming that the protocol even supports redirection. Most do not.}
+      \field{langid}{english}
+      \field{title}{{{GeoDNS}}---{{Geographically-aware}}, Protocol-Agnostic Load Balancing at the {{DNS}} Level}
+      \verb{file}
+      \verb /home/joar/Zotero/storage/SLHVZRZE/Hawley - GeoDNS—Geographically-aware, protocol-agnostic loa.pdf
+      \endverb
     \endentry
     \entry{mouraCacheMeIf2019}{inproceedings}{}{}
       \name{author}{4}{}{%
@@ -361,8 +305,8 @@
       \strng{authornamehash}{a105b4369747a7b496ece026c2fd9121}
       \strng{authorfullhash}{5ce10786a03c3c867657cc9dc68a14dc}
       \strng{authorfullhashraw}{5ce10786a03c3c867657cc9dc68a14dc}
-      \field{sortinit}{8}
-      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{abstract}{DNS depends on extensive caching for good performance, and every DNS zone owner must set Time-to-Live (TTL) values to control their DNS caching. Today there is relatively little guidance backed by research about how to set TTLs, and operators must balance conflicting demands of caching against agility of configuration. Exactly how TTL value choices affect operational networks is quite challenging to understand due to interactions across the distributed DNS service, where resolvers receive TTLs in different ways (answers and hints), TTLs are specified in multiple places (zones and their parent's glue), and while DNS resolution must be security-aware. This paper provides the first careful evaluation of how these multiple, interacting factors affect the effective cache lifetimes of DNS records, and provides recommendations for how to configure DNS TTLs based on our findings. We provide recommendations in TTL choice for different situations, and for where they must be configured. We show that longer TTLs have significant promise in reducing latency, reducing it from 183 ms to 28.7 ms for one country-code TLD.}
@@ -412,8 +356,8 @@
       \strng{authornamehash}{14bb2019476c514ee03229751715d6d2}
       \strng{authorfullhash}{c09eb3d9064da997a8be7242f990b54c}
       \strng{authorfullhashraw}{c09eb3d9064da997a8be7242f990b54c}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{abstract}{The rapid growth of the Internet in users and content has fueled extensive efforts to improve the user's overall Internet experience. A growing number of providers deliver content from multiple servers or proxies to reduce response time by moving content closer to end users. An increasingly popular mechanism to direct clients to the closest point of service is DNS-based redirection, due to its transparency and generality. This paper draws attention to two of the main issues in using DNS: (1) the negative effects of reducing or eliminating the cache lifetimes of DNS information, and (2) the implicit assumption that client nameservers are indicative of actual client location and performance. We quantify the impact of reducing DNS TTL values on Web access latency and show that it can increase name resolution latency by two orders of magnitude. Using HTTP and DNS server logs, as well as a large number of dial-up ISP clients, we measure client-nameserver proximity and show that a significant fraction are distant, more than 8 hops apart. Finally, we suggest protocol modifications to improve the accuracy of DNS-based redirection schemes.}
@@ -433,6 +377,62 @@
       \verb 10.1109/INFCOM.2001.916678
       \endverb
       \keyw{Application software,Delay effects,Domain Name System,Load management,Network servers,Routing protocols,Transport protocols,USA Councils,Web and internet services,Web server}
+    \endentry
+    \entry{jefferyRearchitectingKubernetesEdge2021}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=d07d594aaadc79e8c299fec2bc17372c}{%
+           family={Jeffery},
+           familyi={J\bibinitperiod},
+           given={Andrew},
+           giveni={A\bibinitperiod}}}%
+        {{hash=ab451ce5642ffe31693f5d0a199bee34}{%
+           family={Howard},
+           familyi={H\bibinitperiod},
+           given={Heidi},
+           giveni={H\bibinitperiod}}}%
+        {{hash=ba494cf2fcd5b5c3ed0f9d081c6a4556}{%
+           family={Mortier},
+           familyi={M\bibinitperiod},
+           given={Richard},
+           giveni={R\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {New York, NY, USA}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{e8307cbf017a47415092b7de54a3241c}
+      \strng{fullhash}{d97e5a23afb3c100f30c319279034124}
+      \strng{fullhashraw}{d97e5a23afb3c100f30c319279034124}
+      \strng{bibnamehash}{d97e5a23afb3c100f30c319279034124}
+      \strng{authorbibnamehash}{d97e5a23afb3c100f30c319279034124}
+      \strng{authornamehash}{e8307cbf017a47415092b7de54a3241c}
+      \strng{authorfullhash}{d97e5a23afb3c100f30c319279034124}
+      \strng{authorfullhashraw}{d97e5a23afb3c100f30c319279034124}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Recent years have seen Kubernetes emerge as a primary choice for container orchestration. Kubernetes largely targets the cloud environment but new use cases require performant, available and scalable orchestration at the edge. Kubernetes stores all cluster state in etcd, a strongly consistent key-value store. We find that at larger etcd cluster sizes, offering higher availability, write request latency significantly increases and throughput decreases similarly. Coupled with approximately 30\% of Kubernetes requests being writes, this directly impacts the request latency and availability of Kubernetes, reducing its suitability for the edge. We revisit the requirement of strong consistency and propose an eventually consistent approach instead. This enables higher performance, availability and scalability whilst still supporting the broad needs of Kubernetes. This aims to make Kubernetes much more suitable for performance-critical, dynamically-scaled edge solutions.}
+      \field{booktitle}{Proceedings of the 4th {{International Workshop}} on {{Edge Systems}}, {{Analytics}} and {{Networking}}}
+      \field{isbn}{978-1-4503-8291-5}
+      \field{month}{4}
+      \field{series}{{{EdgeSys}} '21}
+      \field{title}{Rearchitecting {{Kubernetes}} for the {{Edge}}}
+      \field{urlday}{21}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2021}
+      \field{urldateera}{ce}
+      \field{pages}{7\bibrangedash 12}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1145/3434770.3459730
+      \endverb
+      \verb{file}
+      \verb /home/joar/Zotero/storage/Z2ZEZLPJ/Jeffery et al. - 2021 - Rearchitecting Kubernetes for the Edge.pdf
+      \endverb
     \endentry
     \entry{chatterjeeTaskbasedAdaptiveTTL2005}{inproceedings}{}{}
       \name{author}{3}{}{%

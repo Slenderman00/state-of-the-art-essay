@@ -21,6 +21,9 @@
     citecolor=darkblue,
 }
 
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
 \title{
     \textbf{DNS-Based Traffic Steering for IPv6-Enabled Edge Microservices}\\[0.5em]
     \large Extended Project Description
@@ -40,7 +43,7 @@
 % - State the thesis question clearly
 % - Briefly describe the structure of this document
 The modern cloud computing stack relies heavily on Layer 7 proxies and service meshes to manage traffic between services however
-this comes at a cost. These layer 7 proxies introduce single points of failure in otherwise distributed systems, whilst adding unneccesary
+this comes at a cost. These layer 7 proxies introduce single points of failure in otherwise distributed systems, whilst adding unnecessary
 complexity and reducing the effectiveness of layer 3 routing. Service meshes add sidecar containers to every pod.
 This overhead scales with the amount of microservices you have.
 
@@ -49,13 +52,13 @@ NAT (Network Address Translation) and shared address spaces. With the introducti
 making proxies a structural necessity.
 
 With a rapid increase in IPv6 adoption it is time to leave the technical limitations of the past in the past
-and build our services with IPv6s large adress space in mind. Under RIPE-738 \cite{IPv6AddressAllocationa}, a Local internet registry recieves a minimum allocation size of CIDR /32 up to /29
+and build our services with IPv6s large address space in mind. Under RIPE-738 \cite{IPv6AddressAllocationa}, a Local internet registry receives a minimum allocation size of CIDR /32 up to /29
 without needing to justify it. A /29 allocation alone contains around 147 billion times more addresses than the whole IPv4 address space.
 
 This thesis investigates whether DNS-based traffic steering, combined with direct IPv6 addressing of microservices can serve
-as a viable alternative to traditional layer 7 ingress proxies and service meshes. Rather than routing traffic trough a centralized proxy
+as a viable alternative to traditional layer 7 ingress proxies and service meshes. Rather than routing traffic through a centralized proxy
 each pod is assigned a globally routable address and made directly reachable by clients.
-Traffic steering decissions are delegated to a purpose built DNS server that dynamically manages record
+Traffic steering decisions are delegated to a purpose built DNS server that dynamically manages record
 based on pod health and metrics.
 
 The remainder of this document surveys the state of the art in traffic steering and proxy scalability, identifies the gap that motivates this research
@@ -70,20 +73,18 @@ and outlines the proposed approach, experimental methodology and work plan.
 
 Saltzer, Reed and Clark established in 1984 that application specific functions should be
 implemented at the endpoints of a communication system rather than within the network itself \cite{saltzerEndtoendArgumentsSystem1984}.
-A network that simply moves packets without enforcing control points is inherently more ressilient. There are no forced 
-bottlenecks, no single points of failure introduces by the infrastructure itself. Packets are free to be
+A network that simply moves packets without enforcing control points is inherently more resilient. There are no forced
+bottlenecks, no single points of failure introduced by the infrastructure itself. Packets are free to be
 routed as the network sees fit.
 
-The widespread adoption of NAT under IPv4 fundementally broke this principle. By placing address translation logic
+The widespread adoption of NAT under IPv4 fundamentally broke this principle. By placing address translation logic
 inside the network, NAT made end-to-end addressability impossible. Applications could no longer communicate directly over the internet.
-They required proxies, STUN servers and other middleboxes to facilitate communication compansating for the loss of
+They required proxies, STUN servers and other middleboxes to facilitate communication compensating for the loss of
 globally unique addressing.
 
 IPv6 restores the conditions under which end-to-end addressability principle can be applied. With a globally unique address assigned to
 every endpoint there is no longer a structural requirement for address translation or centralized proxies. The network can return to its intended role,
 moving packets between endpoints that are directly reachable by design.
-
-
 
 \subsection{Layer 7 Proxies and Ingress Controllers}
 % What is a proxy, what does it do
@@ -92,12 +93,45 @@ moving packets between endpoints that are directly reachable by design.
 % Centralized bottleneck problem
 % Cite: bachelor comparison, secure reverse proxy
 
+A reverse proxy sits between the client and the backend services as a mandatory intermediary.
+This intermediary is responsible for TLS termination, load balancing, health checking and routing.
+These are functions that every service in the system depends on, making the proxy both a critical component and an
+inherent bottleneck.
+
+HAProxy, NGINX, Envoy and Traefik represent the dominant L7 proxy implementations.
+Despite their differences in design and feature set, they share a common architectural assumption.
+All traffic must pass through a userspace process that terminates connections,
+inspects application-layer content,
+and forwards requests to backend services.
+Wang, Shou, Qian and Liu quantify the cost of this assumption,
+sidecar-based proxies reduce throughput by up to 55.9\% and more than double latency even under light load,
+with only 20\% of that overhead attributable to actual load balancing logic \cite{wangXLBHighPerformance2026}.
+
+The centralization is the problem. All traffic passes through one process that becomes a bottleneck and a single point of failure
+in an otherwise distributed system. The more services present the worse it gets.
+
 \subsection{Service Mesh Architectures}
 % Why service meshes emerged — observability, resilience, policy
 % Sidecar model: Istio, Cilium, AWS App Mesh
 % Overhead analysis — duplicate protocol processing, cross-process cost
 % Movement toward sidecar-less approaches
 % Cite: selecting service mesh, XLB motivation section
+Service meshes are a backbone that is supposed to allow services to arbitrarily talk to each other.
+Most modern service meshes can be seen as consisting of two planes. A data plane and a control plane.
+The data plane consists of sidecar proxies injected into every pod, whilst the control plane
+distributes configurations, certificates and routing rules to the sidecar proxies whilst maintaining a
+global graph of the mesh.
+
+When pod A calls pod B the traffic flows from pod A to pod A's sidecar proxy, through the network and then to pod B's sidecar proxy.
+The sidecar proxy then relays the call to the pod. On top of this the control plane is constantly rotating certificates, changing
+routing rules, updating configurations and managing service discoverability. It becomes its own distributed system just for passing messages
+between nodes of another distributed system.
+
+Li, Lu, Lin, Wu, Zhang and Yan measure the performance of this architecture directly.
+Deploying a service mesh more than doubles communication latency, decreases throughput by over 60\%, and consumes over
+70\% of CPU resources \cite{liFlatProxyDPUcentricService2023}. The large overhead is not incidental, it is a
+consequence of routing every inter-service call through multiple user-space processes, each crossing the kernel boundary multiple
+times per request. This results in an alarming amount of context switches for a system that is supposed to be efficient.
 
 \subsection{Kernel and Hardware Acceleration}
 % The insight: placement of logic in the stack drives overhead
@@ -106,6 +140,36 @@ moving packets between endpoints that are directly reachable by design.
 % Tradeoffs: complexity, compatibility, security model
 % Cite: XLB, FlatProxy, eBPF Kubernetes paper
 
+A recent development in the field is the moving of L7 logic into the
+kernel. Rather than eliminating the proxy, these approaches attempt to reduce its
+overhead by removing the large overhead caused by crossing the kernel user-space boundary
+multiple times per request.
+
+Wang, Shou, Qian and Liu propose XLB, an in kernel L7 load balancer implemented using
+eBPF (Extended Berkley Packet Filtering). By intercepting traffic in the socket layer
+rather than routing it trough a seperate user-space process XLB reduces the cross process
+communication overhead that makes traditional sidecar proxies expensive. The result
+is up to 1.5x higher troughput and 60\% lower latency \cite{wangXLBHighPerformance2026}.
+However, this approach is currently not viable as it requires re-implementing user-space protocols in
+the kernel. XLB only supports unencrypted HTTP 1.1 and support for newer protocols would require the implementation
+of a full in kernel layer 7 network stack, including support for websockets, webtransports, HTTP 3.0 (quic support) and TLS support.
+
+Miziński and Przyłucki confirm the broader trend, finding that Cillium's eBPF based networking
+reduces CPU and memory consumption significantly under load compared to traditional iptables based approaches.
+however, this comes at a sligh cost to raw troughput \cite{mizinskiImpactUsingEBPF2025}.
+
+Li, Lu, Lin, Wu, Zhang and Yan propose FlatProxy, which migrates the service mesh proxy onto
+a Data Processing Unit (DPU). A DPU is a dedicated hardware component, in FlatProxys case it is a Field Programmable Gate Array (FPGA).
+The FlatProxy reduces overhead by running the proxy on the DPU rather than the CPU. However, to avoid implementing L7 protocols on an FPGA
+they have devised a simpler solution. The DPU routes traffic that it has not seen before to a user space process on FlatProxy's CPU.
+The user-space process then creates routing rules that are applied to all future proxies by the DPU. FlatProxy eliminates resource contention between proxy and application, 
+achieving a 90\% reduction in latency and 4x improvement in throughput compared to Envoy \cite{liFlatProxyDPUcentricService2023}. 
+However, DPU-based approaches introduce significant hardware requirements that make them unsuitable for commodity or edge deployments.
+
+Both hardware accelerated proxies and in kernel proxies share a fundemental assumption with the systems they are trying to improve upon:
+traffic must still pass trough a dedicated proxy. The overhead is reduced but, the centralization remains the same.
+
+
 \subsection{DNS-Based Traffic Steering}
 % DNS as a distributed system — what it can and cannot do
 % GeoDNS: geographic steering at Internet scale
@@ -113,6 +177,39 @@ moving packets between endpoints that are directly reachable by design.
 % Cite: Hawley, Moura, Shaikh, Chatterjee
 % The gap: nobody has used DNS as a primary per-pod steering mechanism
 % IPv6 is what makes this viable — globally routable pod addresses
+The Domain Name System (DNS) is part of the backbone of the internet,
+It is what allows our services to remain static as the address space evolves.
+Rather than routing traffic trough a proxy DNS-based traffic steering directs clients to the appropriate
+backend before the connection is even established. The steering decisions happens at or before resolution time instead
+of at request time.
+
+Hawley demonstrated DNS-based geographical traffic steering in 2009 with GeoDNS,
+deployed at kernel.org to distribute Linux kernel downloads across mirrors in multiple countries \cite{hawleyGeoDNSGeographicallyAware}.
+The approach is protocol agnostic and completely transparent to the servers and clients. Notably, DNS-based steering was not
+considered a fringe idea at the time. Wikipedia, Mozilla and the Apache foundation all opperated GeoDNS infrastructure at the time.
+The concept predates all modern cloud paradigms.
+
+DNS is hierarchical. Responsibility for a zone is delegated from parent to child trough a chain of authority.
+At the top of this chain sits the root zone, delegating to top-level domains, which delegate to authorative nameservers for individual domains.
+Each zone has a Start Of Authority (SOA) record that identifies the primary 
+nameserver responsible for that zone and defines the default TTL value for its records.
+
+The canonical limitation of DNS-based steering is TTL caching. Moura, Heidemann and Schmidt demonstrate that recursive 
+resolvers frequently cache records beyond their stated TTL, and that the effective cache lifetime of a record can far 
+exceed what the operator intended \cite{mouraCacheMeIf2019}. Shaikh, Tewari and Agrawal show that reducing TTL 
+to improve steering responsiveness increases nameserver query load by orders of magnitude \cite{shaikhEffectivenessDNSbasedServer2001}. 
+This creates a fundamental tension between steering freshness and infrastructure cost.
+
+This may be mitigated through proper delegation of authority. 
+By delegating a dedicated subzone to its own authoritative nameserver and ensuring that recursive resolvers are only served NS records for that zone, 
+clients are forced to contact the authoritative nameserver directly. 
+The stub resolver on the client machine, upon receiving an NS record, 
+bypasses the recursive resolver's cache entirely and queries the authoritative server. 
+This means steering decisions are always fresh, regardless of what recursive resolvers choose to cache, 
+because the client never receives a cacheable A or AAAA record from the recursive resolver.
+However, modern DNS stub resolvers and recursive servers often only loosely adhere to DNS standards, 
+making the practical effects of fringe delegation mechanisms difficult to predict.
+
 
 \subsection{Edge and Orchestration Context}
 % Kubernetes at the edge — etcd bottleneck, consistency tradeoffs

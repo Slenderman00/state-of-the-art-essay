@@ -4,11 +4,11 @@
 \contentsline {subsection}{\numberline {2.2}Layer 7 Proxies and Ingress Controllers}{3}{subsection.2.2}%
 \contentsline {subsection}{\numberline {2.3}Service Mesh Architectures}{3}{subsection.2.3}%
 \contentsline {subsection}{\numberline {2.4}Kernel and Hardware Acceleration}{3}{subsection.2.4}%
-\contentsline {subsection}{\numberline {2.5}DNS-Based Traffic Steering}{3}{subsection.2.5}%
-\contentsline {subsection}{\numberline {2.6}Edge and Orchestration Context}{3}{subsection.2.6}%
-\contentsline {section}{\numberline {3}Literature Search Methodology}{3}{section.3}%
-\contentsline {section}{\numberline {4}Problem Description}{4}{section.4}%
-\contentsline {section}{\numberline {5}Discussion}{4}{section.5}%
-\contentsline {section}{\numberline {6}Proposed Approach and Methodology}{4}{section.6}%
-\contentsline {section}{\numberline {7}Work Plan and Milestones}{4}{section.7}%
-\contentsline {section}{\numberline {8}Conclusion}{4}{section.8}%
+\contentsline {subsection}{\numberline {2.5}DNS-Based Traffic Steering}{4}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Edge and Orchestration Context}{5}{subsection.2.6}%
+\contentsline {section}{\numberline {3}Literature Search Methodology}{5}{section.3}%
+\contentsline {section}{\numberline {4}Problem Description}{6}{section.4}%
+\contentsline {section}{\numberline {5}Discussion}{6}{section.5}%
+\contentsline {section}{\numberline {6}Proposed Approach and Methodology}{6}{section.6}%
+\contentsline {section}{\numberline {7}Work Plan and Milestones}{6}{section.7}%
+\contentsline {section}{\numberline {8}Conclusion}{7}{section.8}%
