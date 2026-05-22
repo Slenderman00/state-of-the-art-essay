@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.4.17)  22 MAY 2026 17:52
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.4.17)  22 MAY 2026 18:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -705,23 +705,23 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf-dist/fonts
 /enc/dvips/lm/lm-ec.enc}] [2] [3] [4]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
-30.
+32.
  (/usr/share/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 245.
+(Font)              <10> on input line 247.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 245.
+(Font)              <7> on input line 247.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 245.
+(Font)              <5> on input line 247.
 
-Underfull \hbox (badness 6332) in paragraph at lines 253--254
+Underfull \hbox (badness 6332) in paragraph at lines 255--256
 []\T1/lmr/m/n/10 Cilium eBPF vs ipt-a-bles: lower
  []
 
 [5{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}] [6] [7]
-Overfull \hbox (20.93637pt too wide) in paragraph at lines 325--325
+Overfull \hbox (20.93637pt too wide) in paragraph at lines 327--327
 []\T1/lmr/m/it/10.95 IPv6 Ad-dress Al-lo-ca-tion and As-sign-ment Pol-icy\T1/lm
 r/m/n/10.95 , https://www.ripe.net/publications/docs/ripe-
  []
@@ -751,7 +751,7 @@ t/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/lm
 /texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf-dist/fonts/type1/
 public/lm/lmri10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></
 usr/share/texmf-dist/fonts/type1/public/lm/lmtt12.pfb>
-Output written on main.pdf (8 pages, 237310 bytes).
+Output written on main.pdf (8 pages, 237376 bytes).
 PDF statistics:
  214 PDF objects out of 1000 (max. 8388607)
  185 compressed objects within 2 object streams
