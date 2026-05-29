@@ -213,10 +213,33 @@ making the practical effects of fringe delegation mechanisms difficult to predic
 No one has applied this at the per-pod level in a microservice enviroment.
 
 
-\subsection{Edge and Orchestration Context}
+\subsection{Distributed systems at the Edge}
 % Kubernetes at the edge — etcd bottleneck, consistency tradeoffs
 % Pressure on centralized control assumptions
 % Cite: Rearchitecting Kubernetes for the Edge
+
+Historically cloud native systems have been designed around centralized datacenters where
+services operate within a relatively stable and well connected enviroment. The emergence of 5G
+has renewed interest in Multi-access Edge Computing (MEC), where computational resources are deployed
+closer to users. By deploying smaller datacenters alongside 5G access infrastructure, computation
+can be performed closer to the point where traffic enters the network, reducing latency and lowering
+strain on the wider internet.
+
+Unlike traditional cloud deployments, a MEC enviroment might consist of hundreads of
+geographically distributed deployments. Architectures that rely on centralized traffic steering
+must therefore operate over much larger number of sites. As a system grows, the cost and complexity
+of maintaining centralized coordination grows. In contrast, architectures that rely primarily on
+local decision making can expand more organically, allowing new deployment sites to be added without
+proportionally increasing the burden on centralized infrastructure.
+
+Similar principles can be observed in large-scale infrastructure that has evolved over time, 
+such as electrical power networks. Rather than being designed around a fixed topology,
+power networks have gradually expanded through the addition of new power plants,
+substations and transmission lines. The architecture permits incremental growth, 
+allowing the system to adapt to changing demand without requiring fundamental redesign. 
+This illustrates an important property of large-scale infrastructure. 
+Systems that are built around local connectivity and loosely coupled components can often 
+scale more organically than systems that depend on centralized coordination.
 
 \section{Literature Search Methodology}
 % How the search was conducted
