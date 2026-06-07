@@ -146,17 +146,17 @@ overhead by removing the large overhead caused by crossing the kernel user-space
 multiple times per request.
 
 Wang, Shou, Qian and Liu propose XLB, an in kernel L7 load balancer implemented using
-eBPF (Extended Berkley Packet Filtering). By intercepting traffic in the socket layer
-rather than routing it trough a seperate user-space process XLB reduces the cross process
+eBPF (Extended Berkeley Packet Filtering). By intercepting traffic in the socket layer
+rather than routing it through a separate user-space process XLB reduces the cross process
 communication overhead that makes traditional sidecar proxies expensive. The result
-is up to 1.5x higher troughput and 60\% lower latency \cite{wangXLBHighPerformance2026}.
+is up to 1.5x higher throughput and 60\% lower latency \cite{wangXLBHighPerformance2026}.
 However, this approach is currently not viable as it requires re-implementing user-space protocols in
 the kernel. XLB only supports unencrypted HTTP 1.1 and support for newer protocols would require the implementation
 of a full in kernel layer 7 network stack, including support for websockets, webtransports, HTTP 3.0 (quic support) and TLS support.
 
-Miziński and Przyłucki confirm the broader trend, finding that Cillium's eBPF based networking
+Miziński and Przyłucki confirm the broader trend, finding that Cilium's eBPF based networking
 reduces CPU and memory consumption significantly under load compared to traditional iptables based approaches.
-however, this comes at a sligh cost to raw troughput \cite{mizinskiImpactUsingEBPF2025}.
+however, this comes at a slight cost to raw throughput \cite{mizinskiImpactUsingEBPF2025}.
 
 Li, Lu, Lin, Wu, Zhang and Yan propose FlatProxy, which migrates the service mesh proxy onto
 a Data Processing Unit (DPU). A DPU is a dedicated hardware component, in FlatProxys case it is a Field Programmable Gate Array (FPGA).
@@ -166,8 +166,8 @@ The user-space process then creates routing rules that are applied to all future
 achieving a 90\% reduction in latency and 4x improvement in throughput compared to Envoy \cite{liFlatProxyDPUcentricService2023}. 
 However, DPU-based approaches introduce significant hardware requirements that make them unsuitable for commodity or edge deployments.
 
-Both hardware accelerated proxies and in kernel proxies share a fundemental assumption with the systems they are trying to improve upon:
-traffic must still pass trough a dedicated proxy. The overhead is reduced but, the centralization remains the same.
+Both hardware accelerated proxies and in kernel proxies share a fundamental assumption with the systems they are trying to improve upon:
+traffic must still pass through a dedicated proxy. The overhead is reduced but, the centralization remains the same.
 
 
 \subsection{DNS-Based Traffic Steering}
@@ -177,20 +177,20 @@ traffic must still pass trough a dedicated proxy. The overhead is reduced but, t
 % Cite: Hawley, Moura, Shaikh, Chatterjee
 % The gap: nobody has used DNS as a primary per-pod steering mechanism
 % IPv6 is what makes this viable — globally routable pod addresses
-The Domain Name System (DNS) is part of the backbone of the internet,
+The Domain Name System (DNS) is part of the backbone of the internet.
 It is what allows our services to remain static as the address space evolves.
-Rather than routing traffic trough a proxy DNS-based traffic steering directs clients to the appropriate
-backend before the connection is even established. The steering decisions happens at or before resolution time instead
+Rather than routing traffic through a proxy DNS-based traffic steering directs clients to the appropriate
+backend before the connection is even established. The steering decision happens at or before resolution time instead
 of at request time.
 
 Hawley demonstrated DNS-based geographical traffic steering in 2009 with GeoDNS,
 deployed at kernel.org to distribute Linux kernel downloads across mirrors in multiple countries \cite{hawleyGeoDNSGeographicallyAware}.
 The approach is protocol agnostic and completely transparent to the servers and clients. Notably, DNS-based steering was not
-considered a fringe idea at the time. Wikipedia, Mozilla and the Apache foundation all opperated GeoDNS infrastructure at the time.
+considered a fringe idea at the time. Wikipedia, Mozilla and the Apache foundation all operated GeoDNS infrastructure at the time.
 The concept predates all modern cloud paradigms.
 
-DNS is hierarchical. Responsibility for a zone is delegated from parent to child trough a chain of authority.
-At the top of this chain sits the root zone, delegating to top-level domains, which delegate to authorative nameservers for individual domains.
+DNS is hierarchical. Responsibility for a zone is delegated from parent to child through a chain of authority.
+At the top of this chain sits the root zone, delegating to top-level domains, which delegate to authoritative nameservers for individual domains.
 Each zone has a Start Of Authority (SOA) record that identifies the primary 
 nameserver responsible for that zone and defines the default TTL value for its records.
 
@@ -199,6 +199,8 @@ resolvers frequently cache records beyond their stated TTL, and that the effecti
 exceed what the operator intended \cite{mouraCacheMeIf2019}. Shaikh, Tewari and Agrawal show that reducing TTL 
 to improve steering responsiveness increases nameserver query load by orders of magnitude \cite{shaikhEffectivenessDNSbasedServer2001}. 
 This creates a fundamental tension between steering freshness and infrastructure cost.
+Chatterjee, Tari and Zomaya propose adapting TTL values dynamically to the workload rather than fixing them, 
+reducing client perceived latency while limiting the query load cost \cite{chatterjeeTaskbasedAdaptiveTTL2005}.
 
 This may be mitigated through proper delegation of authority. 
 By delegating a dedicated subzone to its own authoritative nameserver and ensuring that recursive resolvers are only served NS records for that zone, 
@@ -210,7 +212,40 @@ because the client never receives a cacheable A or AAAA record from the recursiv
 However, modern DNS stub resolvers and recursive servers often only loosely adhere to DNS standards, 
 making the practical effects of fringe delegation mechanisms difficult to predict.
 
-No one has applied this at the per-pod level in a microservice enviroment.
+The same delegation can serve multiple NS records, 
+so a resolver that cannot reach one authoritative nameserver retries another, 
+giving the steering infrastructure the same decentralized failover.
+
+Returning multiple records gives clients alternatives, and modern clients act on them through Happy Eyeballs (RFC 8305), 
+which races connection attempts across the returned addresses and proceeds with whichever responds first \cite{schinaziHappyEyeballsVersion2017a}.
+A dead backend is simply the address that loses the race, so the client fails over to a working one at connection time, 
+with no central health checker. Where a proxy detects failure through periodic health checks, 
+a Happy Eyeballs client detects it immediately as part of connecting.
+
+to our knowledge no one has applied dns-based steering at the per-pod level in a microservice environment.
+
+\subsection{Media over QUIC and the Fanout Proxy}
+
+Not every proxy performs the per request steering this thesis seeks to eliminate. Media over QUIC (MoQ)
+is an up and coming protocol for efficient low latency media streaming, currently progressing trough
+the IETF standards process \cite{nandakumarMediaQUICTransport2026}. It is built around a network of relays.
+A publisher emmits a stream of objects to a relay, the relay forwards those objects onto its subscribers.
+The subscribers may themselves be further relays. In this way a single source is fanned out to a large audience
+without the publisher needing to reach each subscriber directly.
+
+What distinguishes MoQ from the proxies surveyed above is that it performs no per request
+processing on the data it carries. The specifications requires the relay to treat the object payload as opaque,
+and forbids it from combining, splitting or otherwise modifying payloads when forwarding \cite{nandakumarMediaQUICTransport2026}.
+A subscription is established once, and from that point the relay simply forwards objects along an already decided path.
+The relay does not inspect content to make routing decisions per message. It is a pipe instead of a router.
+
+A relay and a steering proxy are therefore doing fundamentally different jobs.
+A steering proxy makes a routing decision on every request, work the endpoints could in principle perform.
+A relay performs a fanout. The delivery of one stream to many recipients,
+which a single publisher cannot achieve alone. One is a convenience place in the hot path.
+The other is a function that can only exist in the network. MoQ shows that a relay stripped of per
+request processing remains a complete and capable architecture, suggesting that
+the per request decisions, not the relay itself is the part that can be removed.
 
 
 \subsection{Distributed systems at the Edge}
@@ -219,16 +254,25 @@ No one has applied this at the per-pod level in a microservice enviroment.
 % Cite: Rearchitecting Kubernetes for the Edge
 
 Historically cloud native systems have been designed around centralized datacenters where
-services operate within a relatively stable and well connected enviroment. The emergence of 5G
+services operate within a relatively stable and well connected environment. The emergence of 5G
 has renewed interest in Multi-access Edge Computing (MEC), where computational resources are deployed
 closer to users. By deploying smaller datacenters alongside 5G access infrastructure, computation
 can be performed closer to the point where traffic enters the network, reducing latency and lowering
 strain on the wider internet.
 
-Unlike traditional cloud deployments, a MEC enviroment might consist of hundreads of
+Unlike traditional cloud deployments, a MEC environment might consist of hundreds of
 geographically distributed deployments. Architectures that rely on centralized traffic steering
-must therefore operate over much larger number of sites. As a system grows, the cost and complexity
-of maintaining centralized coordination grows. In contrast, architectures that rely primarily on
+must therefore operate over a much larger number of sites. As a system grows, the cost and complexity
+
+of maintaining centralized coordination grows. Jeffery, Howard and Mortier demonstrate this
+directly in Kubernetes, showing that etcd's consistent datastore degrades in write latency
+and throughput as the cluster grows, becoming a bottleneck that limits scalability at the edge \cite{jefferyRearchitectingKubernetesEdge2021}.
+They argue that the bottleneck stems from etcd's requirement for consistency: 
+every node must agree to a write before it is confirmed. Relaxing this requirement, 
+so that nodes converge over time instead, removes the bottleneck. 
+The tradeoff is immediate consistency for availability and scalability \cite{jefferyRearchitectingKubernetesEdge2021}.
+
+In contrast, architectures that rely primarily on
 local decision making can expand more organically, allowing new deployment sites to be added without
 proportionally increasing the burden on centralized infrastructure.
 
@@ -287,57 +331,57 @@ The resulting set of nine papers is summarized in Table \ref{tab:papers}.
 \end{table}
 
 \section{Problem Description}
-% Detailed statement of the research problem
-% What gap does this thesis address
-% Concrete examples of the limitations of current approaches
-% How PEAK (prior work) motivates the research question
-% What we do not yet know — the experimental gap
+After reviewing a wide spread of articles a pattern becomes clear: The state of the 
+art is focused on proxy efficiency rather than proxy elimination. Every approach surveyed
+from userspace proxies to service meshes to hardware and kernel based solutions, reduces the cost of
+the central proxy without questioning whether it needs to exist at all. XLB moves the load balancer into the kernel
+to avoid the userspace boundary \cite{wangXLBHighPerformance2026}. FlatProxy moves it onto dedicated hardware
+to avoid competing with the application for CPU \cite{liFlatProxyDPUcentricService2023}.
+Both make the proxy faster. Neither removes it. The traffic still passes trough a dedicated
+node that every request depends on.
 
-\section{Discussion}
-% Comparison across approaches
-% Common patterns: all current approaches assume centralized L7 control
-% The overhead is not incidental — it is structural
-% IPv6 + DNS as a structural alternative
-% What tradeoffs does the proposed approach introduce
-% Consistency guarantees, TTL propagation, failure detection
+This shared assumption is not incidental, it is inherited. As established in Section 2.1, the
+proxy became a structural necessity when NAT broke end-to-end addressability under IPv4.
+With every endpoint forced behind a translation layer, a middlebox was the only place certain functions could live.
+The efficiency focused work improves this middlebox without revisiting the constraint that created it.
+IPv6 removes the constraint. With a globally routable address on every pod, there is no longer a structural reason
+for the steering decision to happen within the hot path.
+
+This raises the question this thesis investigates. Can the central proxy be eliminated entirely,
+rather than merely being optimized? An ingress proxy and a service mesh sidecar, viewed as steering mechanisms do the same job,
+they intercept a request and direct it to a backend. The defining property of this job is that it happens per request.
+DNS based steering cannot do this. It steers per resolution, handing the clients a set of addresses before the connection is established.
+The core claim of this thesis is that per request steering is not necessary for the workloads that dominate distributed systems,
+and that steering at or before resolution time rather than per request is sufficient to replace the centralized proxy.
+
+This is not a free substitution. Steering per resolution rather than per request means the system cannot redirect a connection once it has been established.
+A client pinned to a backend stays there for the life of the connection. For short lived or frequently re-resolving clients this costs nothing. For long lived
+multiplexed connections it can be a real limitation, and identifying where this limitation becomes the limiting factor is part of what this research
+sets out to measure. This thesis is a first step towards the broader claim that per request steering is unnecessary. It does not
+prove universally, but it tests whether a proxy less DNS steered architecture holds up against the approaches that keep the central proxy.
+
 
 \section{Proposed Approach and Methodology}
-% Describe the PEAK architecture and PeakDNS
-% What the thesis will build on top of the prior work
-% Experimental design:
-%   - DNS server as Kubernetes ingress controller
-%   - IPv6 globally routable pod addresses
-%   - Prometheus-based metric-driven record management
-%   - Dummy microservices and client simulators
-%   - Constant pod count, varying client count
-%   - Metrics: RTT, throughput, CPU, failover behavior
+This thesis proposes that the central proxy can be removed entirely rather than optimized,
+and aims to evaluate that proposal experimentally. Each pod is assigned its own globally routable 
+IPv6 address and made directly reachable by clients. In place of a Layer 7 ingress proxy, 
+a purpose-built DNS server performs steering by managing the records returned for a service, 
+selecting backends according to pod health and metrics. 
+Steering decisions are therefore made at or before resolution time, 
+and traffic flows directly from client to pod without passing through an intermediary process. 
 
-\section{Work Plan and Milestones}
+The core of the work is the design and implementation of a minimal DNS server that functions as a Kubernetes ingress controller. 
+Rather than routing traffic it dynamically manages the address records for each service based on live pod metrics, 
+returning a spread of healthy backends and withdrawing records for pods that are unhealthy or overloaded. 
+Failover is handled by the mechanisms described in Section 2.5, multiple records combined with Happy Eyeballs at the connection layer, 
+and multiple NS records at the authoritative layer. No central health checker or request-path proxy is required.
 
-\subsection*{Spring 2026}
-\begin{itemize}
-    \item Systematization of knowledge and literature study
-    \item Write and submit mandatory essay on the state of proxy scalability
-    \item Restructure essay into draft systematization of knowledge chapter
-    \item Start development of DNS server
-\end{itemize}
-
-\subsection*{Autumn 2026}
-\begin{itemize}
-    \item Finish development of DNS server and custom ingress controller
-    \item Implement client simulator and dummy microservices
-    \item Select baseline paradigms
-    \item Start developing the experiments
-    \item Begin writing thesis background and methodology chapters
-\end{itemize}
-
-\subsection*{Spring 2027}
-\begin{itemize}
-    \item Perform the experiments
-    \item Analyze the results
-    \item Write article on DNS-based traffic steering
-    \item Finish master thesis
-\end{itemize}
+To evaluate this architecture it is compared against baseline paradigms drawn from the systematization above, configured according to best practice. 
+The evaluation uses dummy microservices and a client simulator deployed in a Kubernetes cluster. 
+The number of pods is held constant while the number of simulated clients is varied, isolating the effect of client load on each paradigm. 
+The metrics collected are round trip time, throughput, CPU utilisation, and failover behaviour following simulated pod and node crashes. 
+Comparing these across the DNS-based approach and the Layer 7 baselines allows the central question to be answered: 
+whether steering at or before resolution can match the request-path proxies it seeks to replace, and where, if anywhere, the per resolution model breaks down.
 
 \section{Conclusion}
 % Summarize the state of the art

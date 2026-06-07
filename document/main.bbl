@@ -378,6 +378,148 @@
       \endverb
       \keyw{Application software,Delay effects,Domain Name System,Load management,Network servers,Routing protocols,Transport protocols,USA Councils,Web and internet services,Web server}
     \endentry
+    \entry{chatterjeeTaskbasedAdaptiveTTL2005}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=7b45461091277ea84e6b52ead1b5bcf3}{%
+           family={Chatterjee},
+           familyi={C\bibinitperiod},
+           given={D.},
+           giveni={D\bibinitperiod}}}%
+        {{hash=1d94b277d4e5a568303a59a5e27452fa}{%
+           family={Tari},
+           familyi={T\bibinitperiod},
+           given={Z.},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=17947799fc4f3c05df7ae9ecc7fddd21}{%
+           family={Zomaya},
+           familyi={Z\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{e5a134de8dd78cfcc4198fd91f9ba123}
+      \strng{fullhash}{05470d955c5022227259029a656d10a8}
+      \strng{fullhashraw}{05470d955c5022227259029a656d10a8}
+      \strng{bibnamehash}{05470d955c5022227259029a656d10a8}
+      \strng{authorbibnamehash}{05470d955c5022227259029a656d10a8}
+      \strng{authornamehash}{e5a134de8dd78cfcc4198fd91f9ba123}
+      \strng{authorfullhash}{05470d955c5022227259029a656d10a8}
+      \strng{authorfullhashraw}{05470d955c5022227259029a656d10a8}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Web sites attracting a high client-traffic cannot simply rely on either mirrored servers or a single server to balance the client-request generated load. DNS load balancing techniques have shown their advantages in dealing with heavy Web traffic. These techniques use the time-to-live (TTL) value associated with a name-to-address translation. Unfortunately name-to-address translations are cached in intermediate name servers for a period defined by the TTL This results in all requests reaching the same Web server for this TTL period. The proposed adaptive-TTL approach (called DLB-TS - dynamic load balancing based on task size) takes into account the time taken to fetch a document while choosing the least loaded server. To alleviate the problems of client-side caching and non-cooperative intermediate name servers, a server-side redirection is proposed and implemented. Though the algorithm caused degraded performance because of server-side load balancing under a light load, it reduced the client perceived latency by at least 16\% when compared to existing size-based algorithms.}
+      \field{booktitle}{10th {{IEEE Symposium}} on {{Computers}} and {{Communications}} ({{ISCC}}'05)}
+      \field{issn}{1530-1346}
+      \field{month}{6}
+      \field{title}{A Task-Based Adaptive {{TTL}} Approach for {{Web}} Server Load Balancing}
+      \field{urlday}{21}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2005}
+      \field{urldateera}{ce}
+      \field{pages}{877\bibrangedash 884}
+      \range{pages}{8}
+      \verb{doi}
+      \verb 10.1109/ISCC.2005.19
+      \endverb
+      \verb{file}
+      \verb /home/joar/Zotero/storage/MXXVTF22/1493827.html
+      \endverb
+      \keyw{Australia,Bandwidth,Computer science,Degradation,Delay,Information technology,Internet,Load management,Uniform resource locators,Web server}
+    \endentry
+    \entry{schinaziHappyEyeballsVersion2017a}{report}{}{}
+      \name{author}{2}{}{%
+        {{hash=7144f6649664d719ca5849a34a99a89b}{%
+           family={Schinazi},
+           familyi={S\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=ac0a7d691b742a1140a5c89205e46958}{%
+           family={Pauly},
+           familyi={P\bibinitperiod},
+           given={Tommy},
+           giveni={T\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {Internet Engineering Task Force}%
+      }
+      \strng{namehash}{65e73d3f3d07e2e0a7530181ab576d7e}
+      \strng{fullhash}{65e73d3f3d07e2e0a7530181ab576d7e}
+      \strng{fullhashraw}{65e73d3f3d07e2e0a7530181ab576d7e}
+      \strng{bibnamehash}{65e73d3f3d07e2e0a7530181ab576d7e}
+      \strng{authorbibnamehash}{65e73d3f3d07e2e0a7530181ab576d7e}
+      \strng{authornamehash}{65e73d3f3d07e2e0a7530181ab576d7e}
+      \strng{authorfullhash}{65e73d3f3d07e2e0a7530181ab576d7e}
+      \strng{authorfullhashraw}{65e73d3f3d07e2e0a7530181ab576d7e}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{Many communication protocols operating over the modern Internet use hostnames. These often resolve to multiple IP addresses, each of which may have different performance and connectivity characteristics. Since specific addresses or address families (IPv4 or IPv6) may be blocked, broken, or sub-optimal on a network, clients that attempt multiple connections in parallel have a chance of establishing a connection more quickly. This document specifies requirements for algorithms that reduce this user-visible delay and provides an example algorithm, referred to as "Happy Eyeballs". This document obsoletes the original algorithm description in RFC 6555.}
+      \field{month}{12}
+      \field{number}{RFC 8305}
+      \field{shorttitle}{Happy {{Eyeballs Version}} 2}
+      \field{title}{Happy {{Eyeballs Version}} 2: {{Better Connectivity Using Concurrency}}}
+      \field{type}{Request for {{Comments}}}
+      \field{urlday}{7}
+      \field{urlmonth}{6}
+      \field{urlyear}{2026}
+      \field{year}{2017}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.17487/RFC8305
+      \endverb
+    \endentry
+    \entry{nandakumarMediaQUICTransport2026}{report}{}{}
+      \name{author}{4}{}{%
+        {{hash=ee56a9d1cef3a37d3e37e864afb12536}{%
+           family={Nandakumar},
+           familyi={N\bibinitperiod},
+           given={Suhas},
+           giveni={S\bibinitperiod}}}%
+        {{hash=e7380d605a86d0e7d2569d25c88f9e11}{%
+           family={Vasiliev},
+           familyi={V\bibinitperiod},
+           given={Victor},
+           giveni={V\bibinitperiod}}}%
+        {{hash=88db0db59cc96680adc2156d714a4cef}{%
+           family={Swett},
+           familyi={S\bibinitperiod},
+           given={Ian},
+           giveni={I\bibinitperiod}}}%
+        {{hash=2e419ad725163fe1973a77a035fe7a8a}{%
+           family={Frindell},
+           familyi={F\bibinitperiod},
+           given={Alan},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {Internet Engineering Task Force}%
+      }
+      \strng{namehash}{505bb00eb6d7b7c6ed79b4217a9fb561}
+      \strng{fullhash}{2a4aaeb4867a60a09dc9f7b9eb8ebdfe}
+      \strng{fullhashraw}{2a4aaeb4867a60a09dc9f7b9eb8ebdfe}
+      \strng{bibnamehash}{2a4aaeb4867a60a09dc9f7b9eb8ebdfe}
+      \strng{authorbibnamehash}{2a4aaeb4867a60a09dc9f7b9eb8ebdfe}
+      \strng{authornamehash}{505bb00eb6d7b7c6ed79b4217a9fb561}
+      \strng{authorfullhash}{2a4aaeb4867a60a09dc9f7b9eb8ebdfe}
+      \strng{authorfullhashraw}{2a4aaeb4867a60a09dc9f7b9eb8ebdfe}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This document defines Media over QUIC Transport (MOQT), a publish/ subscribe protocol that runs over QUIC and WebTransport. MOQT leverages the features of these transports, such as streams, datagrams, priorities, and partial reliability. MOQT operates both point-to-point and through intermediate relays, enabling scalable low-latency delivery. Despite its name, MOQT is media agnostic and can be used for a wide range of use cases.}
+      \field{month}{5}
+      \field{number}{draft-ietf-moq-transport-18}
+      \field{title}{Media over {{QUIC Transport}}}
+      \field{type}{Internet {{Draft}}}
+      \field{urlday}{7}
+      \field{urlmonth}{6}
+      \field{urlyear}{2026}
+      \field{year}{2026}
+      \field{urldateera}{ce}
+    \endentry
     \entry{jefferyRearchitectingKubernetesEdge2021}{inproceedings}{}{}
       \name{author}{3}{}{%
         {{hash=d07d594aaadc79e8c299fec2bc17372c}{%
@@ -433,56 +575,6 @@
       \verb{file}
       \verb /home/joar/Zotero/storage/Z2ZEZLPJ/Jeffery et al. - 2021 - Rearchitecting Kubernetes for the Edge.pdf
       \endverb
-    \endentry
-    \entry{chatterjeeTaskbasedAdaptiveTTL2005}{inproceedings}{}{}
-      \name{author}{3}{}{%
-        {{hash=7b45461091277ea84e6b52ead1b5bcf3}{%
-           family={Chatterjee},
-           familyi={C\bibinitperiod},
-           given={D.},
-           giveni={D\bibinitperiod}}}%
-        {{hash=1d94b277d4e5a568303a59a5e27452fa}{%
-           family={Tari},
-           familyi={T\bibinitperiod},
-           given={Z.},
-           giveni={Z\bibinitperiod}}}%
-        {{hash=17947799fc4f3c05df7ae9ecc7fddd21}{%
-           family={Zomaya},
-           familyi={Z\bibinitperiod},
-           given={A.},
-           giveni={A\bibinitperiod}}}%
-      }
-      \strng{namehash}{e5a134de8dd78cfcc4198fd91f9ba123}
-      \strng{fullhash}{05470d955c5022227259029a656d10a8}
-      \strng{fullhashraw}{05470d955c5022227259029a656d10a8}
-      \strng{bibnamehash}{05470d955c5022227259029a656d10a8}
-      \strng{authorbibnamehash}{05470d955c5022227259029a656d10a8}
-      \strng{authornamehash}{e5a134de8dd78cfcc4198fd91f9ba123}
-      \strng{authorfullhash}{05470d955c5022227259029a656d10a8}
-      \strng{authorfullhashraw}{05470d955c5022227259029a656d10a8}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{abstract}{Web sites attracting a high client-traffic cannot simply rely on either mirrored servers or a single server to balance the client-request generated load. DNS load balancing techniques have shown their advantages in dealing with heavy Web traffic. These techniques use the time-to-live (TTL) value associated with a name-to-address translation. Unfortunately name-to-address translations are cached in intermediate name servers for a period defined by the TTL This results in all requests reaching the same Web server for this TTL period. The proposed adaptive-TTL approach (called DLB-TS - dynamic load balancing based on task size) takes into account the time taken to fetch a document while choosing the least loaded server. To alleviate the problems of client-side caching and non-cooperative intermediate name servers, a server-side redirection is proposed and implemented. Though the algorithm caused degraded performance because of server-side load balancing under a light load, it reduced the client perceived latency by at least 16\% when compared to existing size-based algorithms.}
-      \field{booktitle}{10th {{IEEE Symposium}} on {{Computers}} and {{Communications}} ({{ISCC}}'05)}
-      \field{issn}{1530-1346}
-      \field{month}{6}
-      \field{title}{A Task-Based Adaptive {{TTL}} Approach for {{Web}} Server Load Balancing}
-      \field{urlday}{21}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{year}{2005}
-      \field{urldateera}{ce}
-      \field{pages}{877\bibrangedash 884}
-      \range{pages}{8}
-      \verb{doi}
-      \verb 10.1109/ISCC.2005.19
-      \endverb
-      \verb{file}
-      \verb /home/joar/Zotero/storage/MXXVTF22/1493827.html
-      \endverb
-      \keyw{Australia,Bandwidth,Computer science,Degradation,Delay,Information technology,Internet,Load management,Uniform resource locators,Web server}
     \endentry
   \enddatalist
 \endrefsection
