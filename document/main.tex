@@ -26,7 +26,6 @@
 
 \title{
     \textbf{DNS-Based Traffic Steering for IPv6-Enabled Edge Microservices}\\[0.5em]
-    \large Extended Project Description
 }
 \author{Joar Heimonen \\ \texttt{contact@joar.me}}
 \date{\today}
@@ -45,24 +44,69 @@
 The modern cloud computing stack relies heavily on Layer 7 proxies and service meshes to manage traffic between services however
 this comes at a cost. These layer 7 proxies introduce single points of failure in otherwise distributed systems, whilst adding unnecessary
 complexity and reducing the effectiveness of layer 3 routing. Service meshes add sidecar containers to every pod.
-This overhead scales with the amount of microservices you have.
+This overhead scales with the number of microservices you have.
 
 This architectural pattern did not emerge by design. IPv4 exhaustion forced the development of technologies like
 NAT (Network Address Translation) and shared address spaces. With the introduction of NAT end-to-end accessibility was broken
 making proxies a structural necessity.
 
 With a rapid increase in IPv6 adoption it is time to leave the technical limitations of the past in the past
-and build our services with IPv6s large address space in mind. Under RIPE-738 \cite{IPv6AddressAllocationa}, a Local internet registry receives a minimum allocation size of CIDR /32 up to /29
+and build our services with IPv6's large address space in mind. Under RIPE-738 \cite{IPv6AddressAllocationa}, a Local internet registry receives a minimum allocation size of CIDR /32 up to /29
 without needing to justify it. A /29 allocation alone contains around 147 billion times more addresses than the whole IPv4 address space.
 
-This thesis investigates whether DNS-based traffic steering, combined with direct IPv6 addressing of microservices can serve
+This master thesis aims to investigate whether DNS-based traffic steering, combined with direct IPv6 addressing of microservices can serve
 as a viable alternative to traditional layer 7 ingress proxies and service meshes. Rather than routing traffic through a centralized proxy
 each pod is assigned a globally routable address and made directly reachable by clients.
-Traffic steering decisions are delegated to a purpose built DNS server that dynamically manages record
+Traffic steering decisions are delegated to a purpose built DNS server that dynamically manages records
 based on pod health and metrics.
 
 The remainder of this document surveys the state of the art in traffic steering and proxy scalability, identifies the gap that motivates this research
-and outlines the proposed approach, experimental methodology and work plan.
+and outlines the proposed approach and experimental methodology.
+
+\section{Literature Search Methodology}
+% How the search was conducted
+% Keywords used
+% Inclusion/exclusion criteria
+% Snowballing
+% Table of papers
+
+The literature search was conducted using Google Scholar and Google Scholar Labs.
+Search terms were initially generated with the assistance of a large language model based on the research topic, and subsequently refined through iterative searching.
+The following keyword queries were used:
+\begin{itemize}
+    \item \textit{DNS TTL load balancing consistency tradeoff}
+    \item \textit{IPv6 end-to-end addressing NAT elimination}
+    \item \textit{eBPF Kubernetes networking performance}
+    \item \textit{service mesh overhead scalability microservices}
+    \item \textit{DNS-based server selection load balancing}
+\end{itemize}
+Papers were selected based on relevance to the research problem, publication venue quality, and citation count.
+The search was supplemented by backward snowballing from the reference lists of key papers, through which several foundational works were identified.
+Papers published in predatory or low-quality journals were excluded.
+
+The resulting set of nine papers is summarized in Table \ref{tab:papers}.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lllp{6cm}}
+\toprule
+\textbf{\#} & \textbf{Authors} & \textbf{Year} & \textbf{Key Claim} \\
+\midrule
+1 & Wang, Shou, Qian, Liu          & 2026 & In-kernel eBPF L7 load balancer, 1.5x throughput over Istio \cite{wangXLBHighPerformance2026} \\
+2 & Li, Lu, Lin, Wu, Zhang, Yan    & 2023 & DPU-centric service mesh, 90\% latency reduction vs Envoy \cite{liFlatProxyDPUcentricService2023} \\
+3 & Hawley                         & 2009 & GeoDNS geographic traffic steering at Internet scale \cite{hawleyGeoDNSGeographicallyAware} \\
+4 & Jeffery, Howard, Mortier       & 2021 & etcd strong consistency bottleneck in edge Kubernetes \cite{jefferyRearchitectingKubernetesEdge2021} \\
+5 & Miziński, Przyłucki            & 2025 & Cilium eBPF vs iptables: lower CPU/memory under load \cite{mizinskiImpactUsingEBPF2025} \\
+6 & Moura, Heidemann, Schmidt      & 2019 & DNS TTL tradeoffs between caching efficiency and routing flexibility \cite{mouraCacheMeIf2019} \\
+7 & Shaikh, Tewari, Agrawal        & 2001 & Reducing DNS TTL increases nameserver load by orders of magnitude \cite{shaikhEffectivenessDNSbasedServer2001} \\
+8 & Chatterjee, Tari, Zomaya       & 2005 & Adaptive TTL approach reduces client-perceived latency by 16\% \cite{chatterjeeTaskbasedAdaptiveTTL2005} \\
+9 & Saltzer, Reed, Clark           & 1984 & End-to-end principle: functions belong at endpoints, not in the network \cite{saltzerEndtoendArgumentsSystem1984} \\
+\bottomrule
+\end{tabular}
+\caption{Papers included in the literature review}
+\label{tab:papers}
+\end{table}
 
 \section{State of the Art in Traffic Steering and Proxy Scalability}
 
@@ -202,15 +246,14 @@ This creates a fundamental tension between steering freshness and infrastructure
 Chatterjee, Tari and Zomaya propose adapting TTL values dynamically to the workload rather than fixing them, 
 reducing client perceived latency while limiting the query load cost \cite{chatterjeeTaskbasedAdaptiveTTL2005}.
 
-This may be mitigated through proper delegation of authority. 
-By delegating a dedicated subzone to its own authoritative nameserver and ensuring that recursive resolvers are only served NS records for that zone, 
-clients are forced to contact the authoritative nameserver directly. 
-The stub resolver on the client machine, upon receiving an NS record, 
-bypasses the recursive resolver's cache entirely and queries the authoritative server. 
-This means steering decisions are always fresh, regardless of what recursive resolvers choose to cache, 
-because the client never receives a cacheable A or AAAA record from the recursive resolver.
-However, modern DNS stub resolvers and recursive servers often only loosely adhere to DNS standards, 
-making the practical effects of fringe delegation mechanisms difficult to predict.
+This may be mitigated through proper delegation of authority. By delegating a dedicated subzone to its own authoritative 
+nameserver and configuring the parent zone to return only NS records for that subzone, recursive resolvers are prevented 
+from serving final A or AAAA answers for the delegated names. Under this model, a client that wants an address for a pod 
+must either follow the delegation to the authoritative steering nameserver or fail resolution. 
+In principle, this moves the steering decision to the authoritative server responsible for the delegated zone, 
+avoiding stale cached address records from the parent zone. In practice, however, modern stub resolvers, recursive resolvers, 
+and client DNS stacks often behave inconsistently,
+making the practical effects of this mechanism difficult to predict.
 
 The same delegation can serve multiple NS records, 
 so a resolver that cannot reach one authoritative nameserver retries another, 
@@ -219,17 +262,17 @@ giving the steering infrastructure the same decentralized failover.
 Returning multiple records gives clients alternatives, and modern clients act on them through Happy Eyeballs (RFC 8305), 
 which races connection attempts across the returned addresses and proceeds with whichever responds first \cite{schinaziHappyEyeballsVersion2017a}.
 A dead backend is simply the address that loses the race, so the client fails over to a working one at connection time, 
-with no central health checker. Where a proxy detects failure through periodic health checks, 
+with no central health checker in the hot path. Where a proxy detects failure through periodic health checks, 
 a Happy Eyeballs client detects it immediately as part of connecting.
 
-to our knowledge no one has applied dns-based steering at the per-pod level in a microservice environment.
+to our knowledge no one has applied DNS-based steering at the per-pod level in a microservice environment.
 
 \subsection{Media over QUIC and the Fanout Proxy}
 
 Not every proxy performs the per request steering this thesis seeks to eliminate. Media over QUIC (MoQ)
-is an up and coming protocol for efficient low latency media streaming, currently progressing trough
+is an up and coming protocol for efficient low latency media streaming, currently progressing through
 the IETF standards process \cite{nandakumarMediaQUICTransport2026}. It is built around a network of relays.
-A publisher emmits a stream of objects to a relay, the relay forwards those objects onto its subscribers.
+A publisher emits a stream of objects to a relay, the relay forwards those objects onto its subscribers.
 The subscribers may themselves be further relays. In this way a single source is fanned out to a large audience
 without the publisher needing to reach each subscriber directly.
 
@@ -285,62 +328,18 @@ This illustrates an important property of large-scale infrastructure.
 Systems that are built around local connectivity and loosely coupled components can often 
 scale more organically than systems that depend on centralized coordination.
 
-\section{Literature Search Methodology}
-% How the search was conducted
-% Keywords used
-% Inclusion/exclusion criteria
-% Snowballing
-% Table of papers
 
-The literature search was conducted using Google Scholar and Google Scholar Labs.
-Search terms were initially generated with the assistance of a large language model based on the research topic, and subsequently refined through iterative searching.
-The following keyword queries were used:
-\begin{itemize}
-    \item \textit{DNS TTL load balancing consistency tradeoff}
-    \item \textit{IPv6 end-to-end addressing NAT elimination}
-    \item \textit{eBPF Kubernetes networking performance}
-    \item \textit{service mesh overhead scalability microservices}
-    \item \textit{DNS-based server selection load balancing}
-\end{itemize}
-Papers were selected based on relevance to the research problem, publication venue quality, and citation count.
-The search was supplemented by backward snowballing from the reference lists of key papers, through which several foundational works were identified.
-Papers published in predatory or low-quality journals were excluded.
-
-The resulting set of nine papers is summarized in Table \ref{tab:papers}.
-
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{lllp{6cm}}
-\toprule
-\textbf{\#} & \textbf{Authors} & \textbf{Year} & \textbf{Key Claim} \\
-\midrule
-1 & Wang, Shou, Qian, Liu          & 2026 & In-kernel eBPF L7 load balancer, 1.5x throughput over Istio \cite{wangXLBHighPerformance2026} \\
-2 & Li, Lu, Lin, Wu, Zhang, Yan    & 2023 & DPU-centric service mesh, 90\% latency reduction vs Envoy \cite{liFlatProxyDPUcentricService2023} \\
-3 & Hawley                         & 2009 & GeoDNS geographic traffic steering at Internet scale \cite{hawleyGeoDNSGeographicallyAware} \\
-4 & Jeffery, Howard, Mortier       & 2021 & etcd strong consistency bottleneck in edge Kubernetes \cite{jefferyRearchitectingKubernetesEdge2021} \\
-5 & Miziński, Przyłucki            & 2025 & Cilium eBPF vs iptables: lower CPU/memory under load \cite{mizinskiImpactUsingEBPF2025} \\
-6 & Moura, Heidemann, Schmidt      & 2019 & DNS TTL tradeoffs between caching efficiency and routing flexibility \cite{mouraCacheMeIf2019} \\
-7 & Shaikh, Tewari, Agrawal        & 2001 & Reducing DNS TTL increases nameserver load by orders of magnitude \cite{shaikhEffectivenessDNSbasedServer2001} \\
-8 & Chatterjee, Tari, Zomaya       & 2005 & Adaptive TTL approach reduces client-perceived latency by 16\% \cite{chatterjeeTaskbasedAdaptiveTTL2005} \\
-9 & Saltzer, Reed, Clark           & 1984 & End-to-end principle: functions belong at endpoints, not in the network \cite{saltzerEndtoendArgumentsSystem1984} \\
-\bottomrule
-\end{tabular}
-\caption{Papers included in the literature review}
-\label{tab:papers}
-\end{table}
-
-\section{Problem Description}
+\section{Problem Description of the Master Thesis}
 After reviewing a wide spread of articles a pattern becomes clear: The state of the 
 art is focused on proxy efficiency rather than proxy elimination. Every approach surveyed
 from userspace proxies to service meshes to hardware and kernel based solutions, reduces the cost of
 the central proxy without questioning whether it needs to exist at all. XLB moves the load balancer into the kernel
 to avoid the userspace boundary \cite{wangXLBHighPerformance2026}. FlatProxy moves it onto dedicated hardware
 to avoid competing with the application for CPU \cite{liFlatProxyDPUcentricService2023}.
-Both make the proxy faster. Neither removes it. The traffic still passes trough a dedicated
+Both make the proxy faster. Neither removes it. The traffic still passes through a dedicated
 node that every request depends on.
 
-This shared assumption is not incidental, it is inherited. As established in Section 2.1, the
+This shared assumption is not incidental, it is inherited. As established in Section 3.1, the
 proxy became a structural necessity when NAT broke end-to-end addressability under IPv4.
 With every endpoint forced behind a translation layer, a middlebox was the only place certain functions could live.
 The efficiency focused work improves this middlebox without revisiting the constraint that created it.
@@ -358,7 +357,7 @@ This is not a free substitution. Steering per resolution rather than per request
 A client pinned to a backend stays there for the life of the connection. For short lived or frequently re-resolving clients this costs nothing. For long lived
 multiplexed connections it can be a real limitation, and identifying where this limitation becomes the limiting factor is part of what this research
 sets out to measure. This thesis is a first step towards the broader claim that per request steering is unnecessary. It does not
-prove universally, but it tests whether a proxy less DNS steered architecture holds up against the approaches that keep the central proxy.
+prove universally, but it tests whether a proxy-less DNS steered architecture holds up against the approaches that keep the central proxy.
 
 
 \section{Proposed Approach and Methodology}
@@ -373,7 +372,7 @@ and traffic flows directly from client to pod without passing through an interme
 The core of the work is the design and implementation of a minimal DNS server that functions as a Kubernetes ingress controller. 
 Rather than routing traffic it dynamically manages the address records for each service based on live pod metrics, 
 returning a spread of healthy backends and withdrawing records for pods that are unhealthy or overloaded. 
-Failover is handled by the mechanisms described in Section 2.5, multiple records combined with Happy Eyeballs at the connection layer, 
+Failover is handled by the mechanisms described in Section 3.5, multiple records combined with Happy Eyeballs at the connection layer, 
 and multiple NS records at the authoritative layer. No central health checker or request-path proxy is required.
 
 To evaluate this architecture it is compared against baseline paradigms drawn from the systematization above, configured according to best practice. 
@@ -388,6 +387,23 @@ whether steering at or before resolution can match the request-path proxies it s
 % What problems remain unsolved
 % What the literature is moving toward
 % Where your thesis fits and what it contributes
+
+This essay has reviewed the state of the art in proxy steering and proxy scalability for cloud native and edge microservice systems.
+The literature shows a clear pattern. Existing approaches largely preserve the proxy as a central part of the architecture while attempting
+to reduce its overhead through userspace optimization, service mesh design, kernel acceleration or dedicated hardware.
+These approaches improve the performance of the proxy, but they do not fundamentally question whether the steering decisions must remain in the hot path.
+
+The problem identified by this essay is that proxy centralization introduces bottlenecks, failure points, and coordination costs that become increasingly significant in
+distributed and edge deployments. IPv6 changes the assumption that originally made many proxy based designs necessary by restoring globally
+routable addressing. This makes it possible to reconsider traffic steering as a resolution time problem rather than a request time problem.
+
+The proposed solution is to assign globally routable IPv6 addresses directly to microservice pods and use a purpose-built DNS server to steer clients
+towards healthy backends based on pod health and metrics. This approach does not claim to replace every function provided by a layer 7 proxy or service mesh.
+In particular DNS based steering cannot redirect already established connections and may be limited for long lived or heavily multiplexed workloads.
+However, these limitations define the boundary that the proposed evaluation intends to measure.
+
+The contribution of the proposed work is therefore to measure whether DNS based steering can remove the central proxy from the hot path for relevant classes of microservice workloads.
+If the approach proves viable, it would offer a simpler and more decentralized alternative to proxy based traffic steering in IPv6 enabled distributed systems.
 
 \newpage
 \printbibliography
